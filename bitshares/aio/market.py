@@ -47,20 +47,20 @@ class Market(SyncMarket):
     """
 
     async def __init__(self, *args, **kwargs):
-        base = kwargs.get("base", None)
-        quote = kwargs.get("quote", None)
+        base = kwargs.get("base")
+        quote = kwargs.get("quote")
 
         if len(args) == 1 and isinstance(args[0], str):
             quote_symbol, base_symbol = assets_from_string(args[0])
             quote = await Asset(quote_symbol, blockchain_instance=self.blockchain)
             base = await Asset(base_symbol, blockchain_instance=self.blockchain)
             dict.__init__(self, {"base": base, "quote": quote})
-        elif len(args) == 0 and base and quote:
+        elif not args and base and quote:
             dict.__init__(self, {"base": base, "quote": quote})
         elif len(args) == 2 and not base and not quote:
             dict.__init__(self, {"base": args[1], "quote": args[0]})
         else:
-            raise ValueError("Unknown Market Format: %s" % str(args))
+            raise ValueError(f"Unknown Market Format: {args}")
 
     async def ticker(self):
         """
@@ -94,15 +94,16 @@ class Market(SyncMarket):
                 }
             }
         """
-        data = {}
         # Core Exchange rate
         if self["quote"]["id"] == "1.3.0":
             cer = self["base"]["options"]["core_exchange_rate"]
         else:
             cer = self["quote"]["options"]["core_exchange_rate"]
-        data["core_exchange_rate"] = await Price(
-            cer, blockchain_instance=self.blockchain
-        )
+        data = {
+            "core_exchange_rate": await Price(
+                cer, blockchain_instance=self.blockchain
+            )
+        }
         if cer["base"]["asset_id"] == self["quote"]["id"]:
             data["core_exchange_rate"] = await data["core_exchange_rate"].invert()
 
@@ -255,8 +256,7 @@ class Market(SyncMarket):
             )
             for x in orders["bids"]
         ]
-        data = {"asks": asks, "bids": bids}
-        return data
+        return {"asks": asks, "bids": bids}
 
     async def get_limit_orders(self, limit=25):
         """
@@ -368,9 +368,8 @@ class Market(SyncMarket):
                   within ``limit`` trades, this call will return an
                   empty array.
         """
-        if not account:
-            if "default_account" in self.blockchain.config:
-                account = self.blockchain.config["default_account"]
+        if not account and "default_account" in self.blockchain.config:
+            account = self.blockchain.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self.blockchain)
@@ -397,9 +396,8 @@ class Market(SyncMarket):
 
         :param bitshares.account.Account account: Account name or instance of Account to show orders for in this market
         """
-        if not account:
-            if "default_account" in self.blockchain.config:
-                account = self.blockchain.config["default_account"]
+        if not account and "default_account" in self.blockchain.config:
+            account = self.blockchain.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, full=True, blockchain_instance=self.blockchain)
@@ -467,9 +465,8 @@ class Market(SyncMarket):
             expiration = (
                 self.blockchain.config["order-expiration"] or 60 * 60 * 24 * 365
             )
-        if not account:
-            if "default_account" in self.blockchain.config:
-                account = self.blockchain.config["default_account"]
+        if not account and "default_account" in self.blockchain.config:
+            account = self.blockchain.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self.blockchain)
@@ -481,7 +478,7 @@ class Market(SyncMarket):
             amount = await Amount(amount, blockchain_instance=self.blockchain)
             assert (
                 amount["asset"]["symbol"] == self["quote"]["symbol"]
-            ), "Price: {} does not match amount: {}".format(str(price), str(amount))
+            ), f"Price: {str(price)} does not match amount: {str(amount)}"
         else:
             amount = await Amount(
                 amount, self["quote"]["symbol"], blockchain_instance=self.blockchain
@@ -562,9 +559,8 @@ class Market(SyncMarket):
         """
         if not expiration:
             expiration = self.blockchain.config["order-expiration"]
-        if not account:
-            if "default_account" in self.blockchain.config:
-                account = self.blockchain.config["default_account"]
+        if not account and "default_account" in self.blockchain.config:
+            account = self.blockchain.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self.blockchain)
@@ -575,7 +571,7 @@ class Market(SyncMarket):
             amount = await Amount(amount, blockchain_instance=self.blockchain)
             assert (
                 amount["asset"]["symbol"] == self["quote"]["symbol"]
-            ), "Price: {} does not match amount: {}".format(str(price), str(amount))
+            ), f"Price: {str(price)} does not match amount: {str(amount)}"
         else:
             amount = await Amount(
                 amount, self["quote"]["symbol"], blockchain_instance=self.blockchain
@@ -638,7 +634,7 @@ class Market(SyncMarket):
         it's collateral asset.
         """
         if not self["quote"].is_bitasset:
-            raise ValueError("Quote (%s) is not a bitasset!" % self["quote"]["symbol"])
+            raise ValueError(f'Quote ({self["quote"]["symbol"]}) is not a bitasset!')
         self["quote"].full = True
         await self["quote"].refresh()
         collateral = await Asset(
@@ -656,7 +652,7 @@ class Market(SyncMarket):
         it's collateral asset.
         """
         if not self["base"].is_bitasset:
-            raise ValueError("base (%s) is not a bitasset!" % self["base"]["symbol"])
+            raise ValueError(f'base ({self["base"]["symbol"]}) is not a bitasset!')
         self["base"].full = True
         await self["base"].refresh()
         collateral = await Asset(

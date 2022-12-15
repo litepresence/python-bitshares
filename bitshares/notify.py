@@ -154,9 +154,8 @@ class Notify(Events, BlockchainInstance):
                             self.on_market(
                                 UpdateCallOrder(i, blockchain_instance=self.blockchain)
                             )
-                        else:
-                            if i:
-                                log.error("Unknown market update type: %s" % i)
+                        elif i:
+                            log.error(f"Unknown market update type: {i}")
 
     def process_account(self, message):
         """

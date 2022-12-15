@@ -24,7 +24,7 @@ async def test_parallel_queries(event_loop, bitshares, assets):
     async def get_info():
         await bitshares.info()
 
-    for _ in range(0, 40):
+    for _ in range(40):
         tasks = []
         tasks.append(asyncio.ensure_future(get_asset("USD")))
         tasks.append(asyncio.ensure_future(get_asset("GOLD")))

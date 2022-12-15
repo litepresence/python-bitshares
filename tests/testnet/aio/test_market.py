@@ -87,7 +87,7 @@ async def test_get_limit_orders(market, place_order):
 @pytest.mark.asyncio
 async def test_trades(market, do_trade):
     trades = [trade async for trade in market.trades()]
-    assert len(trades) > 0
+    assert trades
 
 
 @pytest.mark.asyncio
@@ -130,15 +130,11 @@ async def test_cancel(market, default_account):
 
 @pytest.mark.asyncio
 async def test_core_quote_market(bitshares, assets, bitasset):
-    market = await Market(
-        "{}:USD".format(bitasset.symbol), blockchain_instance=bitshares
-    )
+    market = await Market(f"{bitasset.symbol}:USD", blockchain_instance=bitshares)
     await market.core_quote_market()
 
 
 @pytest.mark.asyncio
 async def test_core_base_market(bitshares, assets, bitasset):
-    market = await Market(
-        "USD:{}".format(bitasset.symbol), blockchain_instance=bitshares
-    )
+    market = await Market(f"USD:{bitasset.symbol}", blockchain_instance=bitshares)
     await market.core_base_market()

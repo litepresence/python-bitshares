@@ -139,7 +139,7 @@ class Testcases(unittest.TestCase):
         nonce = "5862723643998573708"
 
         fee = objects.Asset(amount=0, asset_id="1.3.0")
-        amount = objects.Asset(amount=int(amount), asset_id=asset_id)
+        amount = objects.Asset(amount=amount, asset_id=asset_id)
         self.op = operations.Transfer(
             **{
                 "fee": fee,
@@ -1073,7 +1073,7 @@ class Testcases(unittest.TestCase):
         # Test against Bitshares backened
         self.cm = bitshares.rpc.get_transaction_hex(tx.json())
 
-        print("soll: %s" % self.cm[:-130])
-        print("ist:  %s" % txWire[:-130])
+        print(f"soll: {self.cm[:-130]}")
+        print(f"ist:  {txWire[:-130]}")
         print(txWire[:-130] == self.cm[:-130])
         self.assertEqual(self.cm[:-130], txWire[:-130])

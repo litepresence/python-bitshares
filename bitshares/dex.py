@@ -75,9 +75,8 @@ class Dex(BlockchainInstance):
                      'collateral_asset': 'BTS',
                      'debt': 120.00000}
         """
-        if not account:
-            if "default_account" in self.blockchain.config:
-                account = self.blockchain.config["default_account"]
+        if not account and "default_account" in self.blockchain.config:
+            account = self.blockchain.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = Account(account, full=True, blockchain_instance=self.blockchain)
@@ -111,9 +110,7 @@ class Dex(BlockchainInstance):
                 debt_amount
                 * (bitasset["current_feed"]["maintenance_collateral_ratio"] / 1000)
             )
-            latest = Market("{}:{}".format(base["symbol"], quote["symbol"])).ticker()[
-                "latest"
-            ]
+            latest = Market(f'{base["symbol"]}:{quote["symbol"]}').ticker()["latest"]
             r[quote["symbol"]] = {
                 "collateral": collateral_amount,
                 "debt": debt_amount,
@@ -130,15 +127,14 @@ class Dex(BlockchainInstance):
         :param str symbol: Symbol to close debt position for
         :raises ValueError: if symbol has no open call position
         """
-        if not account:
-            if "default_account" in self.blockchain.config:
-                account = self.blockchain.config["default_account"]
+        if not account and "default_account" in self.blockchain.config:
+            account = self.blockchain.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = Account(account, full=True, blockchain_instance=self.blockchain)
         debts = self.list_debt_positions(account)
         if symbol not in debts:
-            raise ValueError("No call position open for %s" % symbol)
+            raise ValueError(f"No call position open for {symbol}")
         debt = debts[symbol]
         asset = debt["debt"]["asset"]
         collateral_asset = debt["collateral"]["asset"]
@@ -183,9 +179,8 @@ class Dex(BlockchainInstance):
             collateral ratio
         :raises ValueError: if required amounts of collateral are not available
         """
-        if not account:
-            if "default_account" in self.blockchain.config:
-                account = self.blockchain.config["default_account"]
+        if not account and "default_account" in self.blockchain.config:
+            account = self.blockchain.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = Account(account, full=True, blockchain_instance=self.blockchain)
@@ -194,7 +189,7 @@ class Dex(BlockchainInstance):
         symbol = delta["symbol"]
         asset = Asset(symbol, full=True, blockchain_instance=self.blockchain)
         if not asset.is_bitasset:
-            raise ValueError("%s is not a bitasset!" % symbol)
+            raise ValueError(f"{symbol} is not a bitasset!")
         bitasset = asset["bitasset_data"]
 
         # Check minimum collateral ratio
@@ -204,7 +199,7 @@ class Dex(BlockchainInstance):
             new_collateral_ratio = (
                 bitasset["current_feed"]["maintenance_collateral_ratio"] / 1000
             )
-        elif not new_collateral_ratio and symbol in current_debts:
+        elif not new_collateral_ratio:
             new_collateral_ratio = current_debts[symbol]["ratio"]
 
         # Derive Amount of Collateral
@@ -281,9 +276,8 @@ class Dex(BlockchainInstance):
         :raises ValueError: if collateral ratio is smaller than maintenance collateral ratio
         :raises ValueError: if required amounts of collateral are not available
         """
-        if not account:
-            if "default_account" in self.blockchain.config:
-                account = self.blockchain.config["default_account"]
+        if not account and "default_account" in self.blockchain.config:
+            account = self.blockchain.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = Account(account, full=True, blockchain_instance=self.blockchain)

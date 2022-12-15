@@ -21,7 +21,7 @@ async def asset(bitshares):
 @pytest.fixture
 async def testasset(bitshares, create_asset, unused_asset):
     asset = await unused_asset()
-    log.info("Creating asset {}".format(asset))
+    log.info(f"Creating asset {asset}")
     await create_asset(asset, 4)
     return await Asset(asset, blockchain_instance=bitshares)
 

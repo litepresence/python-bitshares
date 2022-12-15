@@ -76,9 +76,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         """
         from .memo import Memo
 
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
 
@@ -302,9 +301,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         :param str account: (optional) the account to allow access
             to (defaults to ``default_account``)
         """
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -344,9 +342,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         """
         from copy import deepcopy
 
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
 
@@ -399,9 +396,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         :param int threshold: The threshold that needs to be reached
             by signatures to be able to interact
         """
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
 
@@ -479,9 +475,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         :param str account: (optional) the account to allow access
             to (defaults to ``default_account``)
         """
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
 
@@ -511,9 +506,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         :param str account: (optional) the account to allow access
             to (defaults to ``default_account``)
         """
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -551,9 +545,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         :param str account: (optional) the account to allow access
             to (defaults to ``default_account``)
         """
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -592,9 +585,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         :param str account: (optional) the account to allow access
             to (defaults to ``default_account``)
         """
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -632,9 +624,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         :param str account: (optional) the account to allow access
             to (defaults to ``default_account``)
         """
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -679,9 +670,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         """
         from .proposal import Proposal
 
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -706,9 +696,9 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
                 "prefix": self.prefix,
             }
             if is_key:
-                update_dict.update({"key_approvals_to_add": [str(approver)]})
+                update_dict["key_approvals_to_add"] = [str(approver)]
             else:
-                update_dict.update({"active_approvals_to_add": [approver["id"]]})
+                update_dict["active_approvals_to_add"] = [approver["id"]]
             op.append(operations.Proposal_update(**update_dict))
         if is_key:
             await self.txbuffer.appendSigner(approver, "active")
@@ -727,17 +717,16 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         """
         from .proposal import Proposal
 
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
-        if not approver:
-            approver = account
-        else:
-            approver = await Account(approver, blockchain_instance=self)
-
+        approver = (
+            await Account(approver, blockchain_instance=self)
+            if approver
+            else account
+        )
         if not isinstance(proposal_ids, (list, set, tuple)):
             proposal_ids = {proposal_ids}
 
@@ -765,9 +754,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         :param str account: (optional) the account to allow access
             to (defaults to ``default_account``)
         """
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -801,9 +789,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         :param str account: (optional) the account to allow access
             to (defaults to ``default_account``)
         """
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -843,9 +830,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         :param str account: (optional) the account to allow access
             to (defaults to ``default_account``)
         """
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -872,9 +858,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         :param str orderNumbers: The Order Object ide of the form
             ``1.7.xxxx``
         """
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, full=False, blockchain_instance=self)
@@ -882,19 +867,18 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         if not isinstance(orderNumbers, (list, set, tuple)):
             orderNumbers = {orderNumbers}
 
-        op = []
-        for order in orderNumbers:
-            op.append(
-                operations.Limit_order_cancel(
-                    **{
-                        "fee": {"amount": 0, "asset_id": "1.3.0"},
-                        "fee_paying_account": account["id"],
-                        "order": order,
-                        "extensions": [],
-                        "prefix": self.prefix,
-                    }
-                )
+        op = [
+            operations.Limit_order_cancel(
+                **{
+                    "fee": {"amount": 0, "asset_id": "1.3.0"},
+                    "fee_paying_account": account["id"],
+                    "order": order,
+                    "extensions": [],
+                    "prefix": self.prefix,
+                }
             )
+            for order in orderNumbers
+        ]
         return await self.finalizeOp(op, account["name"], "active", **kwargs)
 
     async def vesting_balance_withdraw(
@@ -909,9 +893,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         :param str account: (optional) the account to allow access
             to (defaults to ``default_account``)
         """
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -960,18 +943,17 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         assert cer is None or isinstance(
             cer, Price
         ), "cer needs to be instance of `bitshares.price.Price`!"
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
         asset = await Asset(symbol, blockchain_instance=self, full=True)
         backing_asset = asset["bitasset_data"]["options"]["short_backing_asset"]
-        assert (
-            asset["id"] == settlement_price["base"]["asset"]["id"]
-            or asset["id"] == settlement_price["quote"]["asset"]["id"]
-        ), "Price needs to contain the asset of the symbol you'd like to produce a feed for!"
+        assert asset["id"] in [
+            settlement_price["base"]["asset"]["id"],
+            settlement_price["quote"]["asset"]["id"],
+        ], "Price needs to contain the asset of the symbol you'd like to produce a feed for!"
         assert asset.is_bitasset, "Symbol needs to be a bitasset!"
         assert (
             settlement_price["base"]["asset"]["id"] == backing_asset
@@ -1025,17 +1007,16 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         assert isinstance(
             cer, Price
         ), "cer needs to be instance of `bitshares.price.Price`!"
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
         asset = await Asset(symbol, blockchain_instance=self, full=True)
-        assert (
-            asset["id"] == cer["base"]["asset"]["id"]
-            or asset["id"] == cer["quote"]["asset"]["id"]
-        ), "Price needs to contain the asset of the symbol you'd like to produce a feed for!"
+        assert asset["id"] in [
+            cer["base"]["asset"]["id"],
+            cer["quote"]["asset"]["id"],
+        ], "Price needs to contain the asset of the symbol you'd like to produce a feed for!"
 
         cer = await cer.as_base(symbol)
         if cer["quote"]["asset"]["id"] != "1.3.0":
@@ -1088,9 +1069,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
             to (defaults to ``default_account``)
         """
         assert isinstance(amount, Amount)
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -1158,9 +1138,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
             to (defaults to ``default_account``)
         """
 
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -1310,9 +1289,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         assert daily_pay["asset"]["id"] == "1.3.0"
         if not begin:
             begin = datetime.utcnow() + timedelta(seconds=30)
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -1350,9 +1328,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
             to (defaults to ``default_account``)
         """
         assert isinstance(amount, float)
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         amount = await Amount(amount, "1.3.0", blockchain_instance=self)
@@ -1377,9 +1354,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         :param str account: (optional) the account to allow access
             to (defaults to ``default_account``)
         """
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -1407,9 +1383,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         :param str account: (optional) the account to allow access
             to (defaults to ``default_account``)
         """
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -1440,9 +1415,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
     async def bid_collateral(
         self, additional_collateral, debt_covered, account=None, **kwargs
     ):
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -1465,9 +1439,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         return await self.finalizeOp(op, account, "active", **kwargs)
 
     async def asset_settle(self, amount, account=None, **kwargs):
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -1499,9 +1472,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         from binascii import hexlify
         from graphenebase.base58 import ripemd160
 
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = await Account(account, blockchain_instance=self)
@@ -1544,9 +1516,8 @@ class BitShares(AbstractGrapheneChain, SyncBitShares):
         from binascii import hexlify
 
         htlc = await Htlc(htlc_id, blockchain_instance=self)
-        if not account:
-            if "default_account" in self.config:
-                account = self.config["default_account"]
+        if not account and "default_account" in self.config:
+            account = self.config["default_account"]
         if not account:
             account = htlc["to"]
         account = await Account(account, blockchain_instance=self)

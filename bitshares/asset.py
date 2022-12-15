@@ -67,10 +67,10 @@ class Asset(GrapheneAsset):
         self.ensure_full()
         if not self.is_bitasset:
             return
-        r = []
-        for feed in self["bitasset_data"]["feeds"]:
-            r.append(PriceFeed(feed, blockchain_instance=self.blockchain))
-        return r
+        return [
+            PriceFeed(feed, blockchain_instance=self.blockchain)
+            for feed in self["bitasset_data"]["feeds"]
+        ]
 
     @property
     def feed(self):
@@ -122,9 +122,7 @@ class Asset(GrapheneAsset):
                 * (bitasset["current_feed"]["maintenance_collateral_ratio"] / 1000)
             )
             latest = Market(
-                "{}:{}".format(
-                    bitasset["options"]["short_backing_asset"], self["symbol"]
-                )
+                f'{bitasset["options"]["short_backing_asset"]}:{self["symbol"]}'
             ).ticker()["latest"]
             r.append(
                 {
@@ -153,21 +151,19 @@ class Asset(GrapheneAsset):
 
         assert limit <= 100
         assert self.is_bitasset
-        r = []
         ret = self.blockchain.rpc.get_settle_orders(self["id"], limit)
-        for settle in ret[:limit]:
-            r.append(
-                {
-                    "account": Account(
-                        settle["owner"], lazy=True, blockchain_instance=self.blockchain
-                    ),
-                    "amount": Amount(
-                        settle["balance"], blockchain_instance=self.blockchain
-                    ),
-                    "date": formatTimeString(settle["settlement_date"]),
-                }
-            )
-        return r
+        return [
+            {
+                "account": Account(
+                    settle["owner"], lazy=True, blockchain_instance=self.blockchain
+                ),
+                "amount": Amount(
+                    settle["balance"], blockchain_instance=self.blockchain
+                ),
+                "date": formatTimeString(settle["settlement_date"]),
+            }
+            for settle in ret[:limit]
+        ]
 
     def halt(self):
         """Halt this asset from being moved or traded."""
@@ -366,15 +362,15 @@ class Asset(GrapheneAsset):
         flags_int = force_flag(options["flags"], flags)
         options.update({"flags": flags_int})
 
-        if type == "whitelist":
-            options["whitelist_authorities"].extend(
+        if type == "blacklist":
+            options["blacklist_authorities"].extend(
                 [
                     Account(a, blockchain_instance=self.blockchain)["id"]
                     for a in authorities
                 ]
             )
-        if type == "blacklist":
-            options["blacklist_authorities"].extend(
+        elif type == "whitelist":
+            options["whitelist_authorities"].extend(
                 [
                     Account(a, blockchain_instance=self.blockchain)["id"]
                     for a in authorities
@@ -406,14 +402,13 @@ class Asset(GrapheneAsset):
             authorities = []
 
         options = self["options"]
-        if type == "whitelist":
-            for a in authorities:
-                options["whitelist_authorities"].remove(
+        for a in authorities:
+            if type == "blacklist":
+                options["blacklist_authorities"].remove(
                     Account(a, blockchain_instance=self.blockchain)["id"]
                 )
-        if type == "blacklist":
-            for a in authorities:
-                options["blacklist_authorities"].remove(
+            elif type == "whitelist":
+                options["whitelist_authorities"].remove(
                     Account(a, blockchain_instance=self.blockchain)["id"]
                 )
         op = operations.Asset_update(
@@ -451,15 +446,15 @@ class Asset(GrapheneAsset):
                 options["flags"], ["white_list"]
             ), "whitelist feature not enabled"
 
-        if type == "whitelist":
-            options["whitelist_markets"].extend(
+        if type == "blacklist":
+            options["blacklist_markets"].extend(
                 [
                     Asset(a, blockchain_instance=self.blockchain)["id"]
                     for a in authorities
                 ]
             )
-        if type == "blacklist":
-            options["blacklist_markets"].extend(
+        elif type == "whitelist":
+            options["whitelist_markets"].extend(
                 [
                     Asset(a, blockchain_instance=self.blockchain)["id"]
                     for a in authorities
@@ -490,14 +485,13 @@ class Asset(GrapheneAsset):
             authorities = []
 
         options = self["options"]
-        if type == "whitelist":
-            for a in authorities:
-                options["whitelist_markets"].remove(
+        for a in authorities:
+            if type == "blacklist":
+                options["blacklist_markets"].remove(
                     Asset(a, blockchain_instance=self.blockchain)["id"]
                 )
-        if type == "blacklist":
-            for a in authorities:
-                options["blacklist_markets"].remove(
+            elif type == "whitelist":
+                options["whitelist_markets"].remove(
                     Asset(a, blockchain_instance=self.blockchain)["id"]
                 )
         op = operations.Asset_update(

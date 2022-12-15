@@ -39,7 +39,7 @@ class BitSharesNodeRPC(Api):
             if v["chain_id"] == chain_id:
                 return v
         raise exceptions.UnknownNetworkException(
-            "Connecting to unknown network (chain_id: {})!".format(props["chain_id"])
+            f'Connecting to unknown network (chain_id: {props["chain_id"]})!'
         )
 
     def get_account(self, name, **kwargs):

@@ -113,8 +113,7 @@ class Order(Price):
         if len(args) == 1 and isinstance(args[0], str):
             """Load from id."""
             result = await self.blockchain.rpc.get_objects([args[0]])
-            order = result[0]
-            if order:
+            if order := result[0]:
                 await Price.__init__(
                     self, order["sell_price"], blockchain_instance=self.blockchain
                 )
@@ -166,24 +165,19 @@ class Order(Price):
     def __repr__(self):
         """Asyncio version uses simplified mechanics to display details."""
         if "deleted" in self and self["deleted"]:
-            return "deleted order %s" % self["id"]
-        else:
-            t = ""
-            if "time" in self and self["time"]:
-                t += "(%s) " % self["time"]
-            if "type" in self and self["type"]:
-                t += "%s " % str(self["type"])
-            if "for_sale" in self and self["for_sale"]:
-                t += "{} {} for {} ".format(
-                    float(self["for_sale"]) / self["price"],
-                    self["quote"]["asset"]["symbol"],
-                    str(self["for_sale"]),
-                )
-            elif "amount_to_sell" in self:
-                t += "{} for {} ".format(self["amount_to_sell"], self["min_to_receive"])
-            elif "quote" in self and "base" in self:
-                t += "{} for {} ".format(self["quote"], self["base"])
-            return t + "@ " + Price.__repr__(self)
+            return f'deleted order {self["id"]}'
+        t = ""
+        if "time" in self and self["time"]:
+            t += f'({self["time"]}) '
+        if "type" in self and self["type"]:
+            t += f'{str(self["type"])} '
+        if "for_sale" in self and self["for_sale"]:
+            t += f'{float(self["for_sale"]) / self["price"]} {self["quote"]["asset"]["symbol"]} for {str(self["for_sale"])} '
+        elif "amount_to_sell" in self:
+            t += f'{self["amount_to_sell"]} for {self["min_to_receive"]} '
+        elif "quote" in self and "base" in self:
+            t += f'{self["quote"]} for {self["base"]} '
+        return f"{t}@ {Price.__repr__(self)}"
 
     __str__ = __repr__
 
@@ -246,14 +240,14 @@ class FilledOrder(Price):
     def __repr__(self):
         t = ""
         if "time" in self and self["time"]:
-            t += "(%s) " % self["time"]
+            t += f'({self["time"]}) '
         if "type" in self and self["type"]:
-            t += "%s " % str(self["type"])
+            t += f'{str(self["type"])} '
         if "quote" in self and self["quote"]:
-            t += "%s " % str(self["quote"])
+            t += f'{str(self["quote"])} '
         if "base" in self and self["base"]:
-            t += "for %s " % str(self["base"])
-        return t + "@ " + Price.__repr__(self)
+            t += f'for {str(self["base"])} '
+        return f"{t}@ {Price.__repr__(self)}"
 
     __str__ = __repr__
 
@@ -284,10 +278,10 @@ class UpdateCallOrder(Price):
     def __repr__(self):
         t = "Margin Call: "
         if "quote" in self and self["quote"]:
-            t += "%s " % str(self["quote"])
+            t += f'{str(self["quote"])} '
         if "base" in self and self["base"]:
-            t += "%s " % str(self["base"])
-        return t + "@ " + Price.__repr__(self)
+            t += f'{str(self["base"])} '
+        return f"{t}@ {Price.__repr__(self)}"
 
     __str__ = __repr__
 

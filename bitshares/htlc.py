@@ -15,7 +15,7 @@ class Htlc(BlockchainObject):
     type_id = 16
 
     def refresh(self):
-        data = self.blockchain.rpc.get_object(self.identifier)
-        if not data:
+        if data := self.blockchain.rpc.get_object(self.identifier):
+            super(Htlc, self).__init__(data)
+        else:
             raise HtlcDoesNotExistException(self.identifier)
-        super(Htlc, self).__init__(data)
