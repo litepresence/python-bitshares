@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
-asset_permissions = {}
-asset_permissions["charge_market_fee"] = 0x01
-asset_permissions["white_list"] = 0x02
-asset_permissions["override_authority"] = 0x04
-asset_permissions["transfer_restricted"] = 0x08
-asset_permissions["disable_force_settle"] = 0x10
-asset_permissions["global_settle"] = 0x20
-asset_permissions["disable_confidential"] = 0x40
-asset_permissions["witness_fed_asset"] = 0x80
-asset_permissions["committee_fed_asset"] = 0x100
-
-whitelist = {}
-whitelist["no_listing"] = 0x0
-whitelist["white_listed"] = 0x1
-whitelist["black_listed"] = 0x2
-whitelist["white_and_black_listed"] = 0x1 | 0x2
+asset_permissions = {
+    "charge_market_fee": 1,
+    "white_list": 2,
+    "override_authority": 4,
+    "transfer_restricted": 8,
+    "disable_force_settle": 16,
+    "global_settle": 32,
+    "disable_confidential": 64,
+    "witness_fed_asset": 128,
+    "committee_fed_asset": 256,
+}
+whitelist = {
+    "no_listing": 0,
+    "white_listed": 1,
+    "black_listed": 2,
+    "white_and_black_listed": 0x1 | 0x2,
+}
 
 
 def toint(permissions):
@@ -26,10 +27,7 @@ def toint(permissions):
 
 
 def todict(number):
-    r = {}
-    for k, v in asset_permissions.items():
-        r[k] = bool(number & v)
-    return r
+    return {k: bool(number & v) for k, v in asset_permissions.items()}
 
 
 def force_flag(perms, flags):
@@ -42,5 +40,5 @@ def force_flag(perms, flags):
 def test_permissions(perms, flags):
     for p in flags:
         if not asset_permissions[p] & perms:
-            raise Exception("Permissions prevent you from changing %s!" % p)
+            raise Exception(f"Permissions prevent you from changing {p}!")
     return True

@@ -105,9 +105,7 @@ class Asset(GrapheneAsset, SyncAsset):
                 * (bitasset["current_feed"]["maintenance_collateral_ratio"] / 1000)
             )
             market = await Market(
-                "{}:{}".format(
-                    bitasset["options"]["short_backing_asset"], self["symbol"]
-                )
+                f'{bitasset["options"]["short_backing_asset"]}:{self["symbol"]}'
             )
             latest = (await market.ticker())["latest"]
             r.append(
@@ -327,11 +325,11 @@ class Asset(GrapheneAsset, SyncAsset):
         ]
         ids = [a["id"] for a in accounts]
 
-        if type == "whitelist":
-            options["whitelist_authorities"].extend(ids)
         if type == "blacklist":
             options["blacklist_authorities"].extend(ids)
 
+        elif type == "whitelist":
+            options["whitelist_authorities"].extend(ids)
         op = operations.Asset_update(
             **{
                 "fee": {"amount": 0, "asset_id": "1.3.0"},
@@ -359,14 +357,13 @@ class Asset(GrapheneAsset, SyncAsset):
 
         options = self["options"]
 
-        if type == "whitelist":
-            for a in authorities:
-                account = await Account(a, blockchain_instance=self.blockchain)
-                options["whitelist_authorities"].remove(account["id"])
-        if type == "blacklist":
-            for a in authorities:
+        for a in authorities:
+            if type == "blacklist":
                 account = await Account(a, blockchain_instance=self.blockchain)
                 options["blacklist_authorities"].remove(account["id"])
+            elif type == "whitelist":
+                account = await Account(a, blockchain_instance=self.blockchain)
+                options["whitelist_authorities"].remove(account["id"])
         op = operations.Asset_update(
             **{
                 "fee": {"amount": 0, "asset_id": "1.3.0"},
@@ -407,10 +404,10 @@ class Asset(GrapheneAsset, SyncAsset):
         ]
         ids = [asset["id"] for asset in assets]
 
-        if type == "whitelist":
-            options["whitelist_markets"].extend(ids)
         if type == "blacklist":
             options["blacklist_markets"].extend(ids)
+        elif type == "whitelist":
+            options["whitelist_markets"].extend(ids)
         op = operations.Asset_update(
             **{
                 "fee": {"amount": 0, "asset_id": "1.3.0"},
@@ -436,14 +433,13 @@ class Asset(GrapheneAsset, SyncAsset):
             authorities = []
 
         options = self["options"]
-        if type == "whitelist":
-            for a in authorities:
-                asset = await Asset(a, blockchain_instance=self.blockchain)
-                options["whitelist_markets"].remove(asset["id"])
-        if type == "blacklist":
-            for a in authorities:
+        for a in authorities:
+            if type == "blacklist":
                 asset = await Asset(a, blockchain_instance=self.blockchain)
                 options["blacklist_markets"].remove(asset["id"])
+            elif type == "whitelist":
+                asset = await Asset(a, blockchain_instance=self.blockchain)
+                options["whitelist_markets"].remove(asset["id"])
         op = operations.Asset_update(
             **{
                 "fee": {"amount": 0, "asset_id": "1.3.0"},

@@ -26,7 +26,7 @@ class Testcases(unittest.TestCase):
 
     def test_init(self):
         # String init
-        amount = Amount("1 {}".format(self.symbol))
+        amount = Amount(f"1 {self.symbol}")
         self.dotest(amount, 1, self.symbol)
 
         # Amount init
@@ -88,9 +88,7 @@ class Testcases(unittest.TestCase):
         )
 
     def test_string(self):
-        self.assertEqual(
-            str(Amount("1", self.symbol)), "1.00000 {}".format(self.symbol)
-        )
+        self.assertEqual(str(Amount("1", self.symbol)), f"1.00000 {self.symbol}")
 
     def test_int(self):
         self.assertEqual(int(Amount("1", self.symbol)), 100000)

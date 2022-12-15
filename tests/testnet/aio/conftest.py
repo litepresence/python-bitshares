@@ -27,7 +27,7 @@ def event_loop():
 async def bitshares_instance(bitshares_testnet, private_keys, event_loop):
     """Initialize BitShares instance connected to a local testnet."""
     bitshares = BitShares(
-        node="ws://127.0.0.1:{}".format(bitshares_testnet.service_port),
+        node=f"ws://127.0.0.1:{bitshares_testnet.service_port}",
         keys=private_keys,
         num_retries=-1,
         loop=event_loop,

@@ -56,7 +56,7 @@ class_namemap = {}
 
 def fill_classmaps():
     for name, ind in operations.items():
-        classname = name[0:1].upper() + name[1:]
+        classname = name[:1].upper() + name[1:]
         class_namemap[classname] = ind
         try:
             class_idmap[ind] = globals()[classname]
@@ -88,7 +88,7 @@ class Transfer(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             prefix = kwargs.get("prefix", default_prefix)
             if "memo" in kwargs and kwargs["memo"]:
@@ -118,7 +118,7 @@ class Asset_publish_feed(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -138,7 +138,7 @@ class Asset_create(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             if kwargs.get("bitasset_opts"):
                 bitasset_opts = Optional(BitAssetOptions(kwargs["bitasset_opts"]))
@@ -168,7 +168,7 @@ class Asset_update(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             if "new_issuer" in kwargs:
                 raise ValueError(
@@ -196,7 +196,7 @@ class Asset_update_bitasset(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -221,7 +221,7 @@ class Asset_issue(GrapheneObject):
         else:
             prefix = kwargs.get("prefix", default_prefix)
 
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             if "memo" in kwargs and kwargs["memo"]:
                 memo = Optional(Memo(prefix=prefix, **kwargs["memo"]))
@@ -249,7 +249,7 @@ class Op_wrapper(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(OrderedDict([("op", Operation(kwargs["op"]))]))
 
@@ -259,7 +259,7 @@ class Proposal_create(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             if "review_period_seconds" in kwargs:
                 review = Optional(Uint32(kwargs["review_period_seconds"]))
@@ -290,7 +290,7 @@ class Proposal_update(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             for o in [
@@ -375,7 +375,7 @@ class Limit_order_create(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -397,7 +397,7 @@ class Limit_order_cancel(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -419,7 +419,7 @@ class Call_order_update(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -442,7 +442,7 @@ class Asset_fund_fee_pool(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -462,7 +462,7 @@ class Asset_claim_fees(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             super().__init__(
@@ -482,7 +482,7 @@ class Asset_claim_pool(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             super().__init__(
@@ -503,12 +503,9 @@ class Override_transfer(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
-            if "memo" in kwargs:
-                memo = Optional(Memo(kwargs["memo"]))
-            else:
-                memo = Optional(None)
+            memo = Optional(Memo(kwargs["memo"])) if "memo" in kwargs else Optional(None)
             super().__init__(
                 OrderedDict(
                     [
@@ -530,7 +527,7 @@ class Account_create(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             prefix = kwargs.get("prefix", default_prefix)
 
@@ -557,7 +554,7 @@ class Account_update(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             prefix = kwargs.get("prefix", default_prefix)
 
@@ -600,7 +597,7 @@ class Account_whitelist(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             super().__init__(
@@ -627,7 +624,7 @@ class Vesting_balance_withdraw(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             super().__init__(
@@ -650,7 +647,7 @@ class Account_upgrade(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -675,7 +672,7 @@ class Witness_update(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             if "new_url" in kwargs and kwargs["new_url"]:
                 new_url = Optional(String(kwargs["new_url"]))
@@ -708,7 +705,7 @@ class Asset_update_feed_producers(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             kwargs["new_feed_producers"] = sorted(
@@ -744,7 +741,7 @@ class Asset_reserve(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             super().__init__(
@@ -764,7 +761,7 @@ class Worker_create(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             super().__init__(
@@ -788,7 +785,7 @@ class Withdraw_permission_create(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -822,7 +819,7 @@ class Asset_global_settle(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             super().__init__(
@@ -846,7 +843,7 @@ class Committee_member_create(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -867,7 +864,7 @@ class Custom(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -1058,7 +1055,7 @@ class Ticket_create_operation(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             if isinstance(kwargs["target_type"], int):
@@ -1084,7 +1081,7 @@ class Ticket_update_operation(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             if isinstance(kwargs["target_type"], int):
@@ -1116,7 +1113,7 @@ class Liquidity_pool_create(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             super().__init__(
@@ -1143,7 +1140,7 @@ class Liquidity_pool_delete(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             super().__init__(
@@ -1163,7 +1160,7 @@ class Liquidity_pool_deposit(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             super().__init__(
@@ -1185,7 +1182,7 @@ class Liquidity_pool_withdraw(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             super().__init__(
@@ -1206,7 +1203,7 @@ class Liquidity_pool_exchange(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             super().__init__(

@@ -44,20 +44,20 @@ class Market(dict):
     """
 
     def __init__(self, *args, **kwargs):
-        base = kwargs.get("base", None)
-        quote = kwargs.get("quote", None)
+        base = kwargs.get("base")
+        quote = kwargs.get("quote")
 
         if len(args) == 1 and isinstance(args[0], str):
             quote_symbol, base_symbol = assets_from_string(args[0])
             quote = Asset(quote_symbol, blockchain_instance=self.blockchain)
             base = Asset(base_symbol, blockchain_instance=self.blockchain)
             dict.__init__(self, {"base": base, "quote": quote})
-        elif len(args) == 0 and base and quote:
+        elif not args and base and quote:
             dict.__init__(self, {"base": base, "quote": quote})
         elif len(args) == 2 and not base and not quote:
             dict.__init__(self, {"base": args[1], "quote": args[0]})
         else:
-            raise ValueError("Unknown Market Format: %s" % str(args))
+            raise ValueError(f"Unknown Market Format: {args}")
 
     def get_string(self, separator=":"):
         """
@@ -65,7 +65,7 @@ class Market(dict):
 
         :param str separator: The separator of the assets (defaults to ``:``)
         """
-        return "%s%s%s" % (self["quote"]["symbol"], separator, self["base"]["symbol"])
+        return f'{self["quote"]["symbol"]}{separator}{self["base"]["symbol"]}'
 
     def __eq__(self, other):
         if isinstance(other, str):
@@ -115,13 +115,12 @@ class Market(dict):
                 }
             }
         """
-        data = {}
         # Core Exchange rate
         if self["quote"]["id"] == "1.3.0":
             cer = self["base"]["options"]["core_exchange_rate"]
         else:
             cer = self["quote"]["options"]["core_exchange_rate"]
-        data["core_exchange_rate"] = Price(cer, blockchain_instance=self.blockchain)
+        data = {"core_exchange_rate": Price(cer, blockchain_instance=self.blockchain)}
         if cer["base"]["asset_id"] == self["quote"]["id"]:
             data["core_exchange_rate"] = data["core_exchange_rate"].invert()
 
@@ -272,8 +271,7 @@ class Market(dict):
                 orders["bids"],
             )
         )
-        data = {"asks": asks, "bids": bids}
-        return data
+        return {"asks": asks, "bids": bids}
 
     def get_limit_orders(self, limit=25):
         """
@@ -395,9 +393,8 @@ class Market(dict):
                   within ``limit`` trades, this call will return an
                   empty array.
         """
-        if not account:
-            if "default_account" in self.blockchain.config:
-                account = self.blockchain.config["default_account"]
+        if not account and "default_account" in self.blockchain.config:
+            account = self.blockchain.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = Account(account, blockchain_instance=self.blockchain)
@@ -405,18 +402,16 @@ class Market(dict):
         filled = self.blockchain.rpc.get_fill_order_history(
             self["base"]["id"], self["quote"]["id"], 2 * limit, api="history"
         )
-        trades = []
-        for f in filled:
-            if f["op"]["account_id"] == account["id"]:
-                trades.append(
-                    FilledOrder(
-                        f,
-                        base=self["base"],
-                        quote=self["quote"],
-                        blockchain_instance=self.blockchain,
-                    )
-                )
-        return trades
+        return [
+            FilledOrder(
+                f,
+                base=self["base"],
+                quote=self["quote"],
+                blockchain_instance=self.blockchain,
+            )
+            for f in filled
+            if f["op"]["account_id"] == account["id"]
+        ]
 
     def accountopenorders(self, account=None):
         """
@@ -424,26 +419,26 @@ class Market(dict):
 
         :param bitshares.account.Account account: Account name or instance of Account to show orders for in this market
         """
-        if not account:
-            if "default_account" in self.blockchain.config:
-                account = self.blockchain.config["default_account"]
+        if not account and "default_account" in self.blockchain.config:
+            account = self.blockchain.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = Account(account, full=True, blockchain_instance=self.blockchain)
 
-        r = []
         account.refresh()
         orders = account["limit_orders"]
-        for o in orders:
+        return [
+            Order(o, blockchain_instance=self.blockchain)
+            for o in orders
             if (
                 o["sell_price"]["base"]["asset_id"] == self["base"]["id"]
                 and o["sell_price"]["quote"]["asset_id"] == self["quote"]["id"]
-            ) or (
+            )
+            or (
                 o["sell_price"]["base"]["asset_id"] == self["quote"]["id"]
                 and o["sell_price"]["quote"]["asset_id"] == self["base"]["id"]
-            ):
-                r.append(Order(o, blockchain_instance=self.blockchain))
-        return r
+            )
+        ]
 
     def buy(
         self,
@@ -494,9 +489,8 @@ class Market(dict):
             expiration = (
                 self.blockchain.config["order-expiration"] or 60 * 60 * 24 * 365
             )
-        if not account:
-            if "default_account" in self.blockchain.config:
-                account = self.blockchain.config["default_account"]
+        if not account and "default_account" in self.blockchain.config:
+            account = self.blockchain.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = Account(account, blockchain_instance=self.blockchain)
@@ -508,7 +502,7 @@ class Market(dict):
             amount = Amount(amount, blockchain_instance=self.blockchain)
             assert (
                 amount["asset"]["symbol"] == self["quote"]["symbol"]
-            ), "Price: {} does not match amount: {}".format(str(price), str(amount))
+            ), f"Price: {str(price)} does not match amount: {str(amount)}"
         else:
             amount = Amount(
                 amount, self["quote"]["symbol"], blockchain_instance=self.blockchain
@@ -587,9 +581,8 @@ class Market(dict):
         """
         if not expiration:
             expiration = self.blockchain.config["order-expiration"]
-        if not account:
-            if "default_account" in self.blockchain.config:
-                account = self.blockchain.config["default_account"]
+        if not account and "default_account" in self.blockchain.config:
+            account = self.blockchain.config["default_account"]
         if not account:
             raise ValueError("You need to provide an account")
         account = Account(account, blockchain_instance=self.blockchain)
@@ -600,7 +593,7 @@ class Market(dict):
             amount = Amount(amount, blockchain_instance=self.blockchain)
             assert (
                 amount["asset"]["symbol"] == self["quote"]["symbol"]
-            ), "Price: {} does not match amount: {}".format(str(price), str(amount))
+            ), f"Price: {str(price)} does not match amount: {str(amount)}"
         else:
             amount = Amount(
                 amount, self["quote"]["symbol"], blockchain_instance=self.blockchain
@@ -661,7 +654,7 @@ class Market(dict):
         it's collateral asset.
         """
         if not self["quote"].is_bitasset:
-            raise ValueError("Quote (%s) is not a bitasset!" % self["quote"]["symbol"])
+            raise ValueError(f'Quote ({self["quote"]["symbol"]}) is not a bitasset!')
         self["quote"].full = True
         self["quote"].refresh()
         collateral = Asset(
@@ -679,7 +672,7 @@ class Market(dict):
         it's collateral asset.
         """
         if not self["base"].is_bitasset:
-            raise ValueError("base (%s) is not a bitasset!" % self["base"]["symbol"])
+            raise ValueError(f'base ({self["base"]["symbol"]}) is not a bitasset!')
         self["base"].full = True
         self["base"].refresh()
         collateral = Asset(

@@ -26,7 +26,7 @@ class BitSharesNodeRPC(Api):
             if v["chain_id"] == chain_id:
                 return v
         raise exceptions.UnknownNetworkException(
-            "Connecting to unknown network (chain_id: {})!".format(props["chain_id"])
+            f'Connecting to unknown network (chain_id: {props["chain_id"]})!'
         )
 
     async def get_account(self, name, **kwargs):
@@ -35,11 +35,10 @@ class BitSharesNodeRPC(Api):
 
         :param str name: Account name or account id
         """
-        if len(name.split(".")) == 3:
-            result = await self.get_objects([name])
-            return result[0]
-        else:
+        if len(name.split(".")) != 3:
             return await self.get_account_by_name(name, **kwargs)
+        result = await self.get_objects([name])
+        return result[0]
 
     async def get_asset(self, name, **kwargs):
         """
@@ -49,10 +48,10 @@ class BitSharesNodeRPC(Api):
         """
         if len(name.split(".")) == 3:
             result = await self.get_objects([name], **kwargs)
-            return result[0]
         else:
             result = await self.lookup_asset_symbols([name], **kwargs)
-            return result[0]
+
+        return result[0]
 
     async def get_object(self, o, **kwargs):
         """

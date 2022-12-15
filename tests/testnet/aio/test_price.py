@@ -57,17 +57,17 @@ async def test_order_repr(bitshares, default_account, market):
     await asyncio.sleep(1.1)
     tx = await market.buy(1, 1, account=default_account, returnOrderId="head")
     order = await Order(tx["orderid"])
-    log.info("Order from id: {}".format(order))
+    log.info(f"Order from id: {order}")
 
     # Load from raw object 1.7.x
     result = await bitshares.rpc.get_objects([tx["orderid"]])
     order = await Order(result[0])
-    log.info("Order from object 1.7.x: {}".format(order))
+    log.info(f"Order from object 1.7.x: {order}")
 
     # Load from an operation
     trx = await market.buy(1, 1, account=default_account)
     order = await Order(trx["operations"][0][1])
-    log.info("Order from an operation: {}".format(order))
+    log.info(f"Order from an operation: {order}")
 
 
 @pytest.mark.asyncio
@@ -83,18 +83,18 @@ async def test_order_init_no_shared_instance(
     tx = await market.buy(1, 1, account=default_account, returnOrderId="head")
     order = await Order(tx["orderid"], blockchain_instance=bitshares)
     assert "id" in order
-    log.info("Order from id: {}".format(order))
+    log.info(f"Order from id: {order}")
 
     # Load from raw object 1.7.x
     result = await bitshares.rpc.get_objects([tx["orderid"]])
     order = await Order(result[0], blockchain_instance=bitshares)
     assert "id" in order
-    log.info("Order from object 1.7.x: {}".format(order))
+    log.info(f"Order from object 1.7.x: {order}")
 
     # Load from an operation
     trx = await market.buy(1, 1, account=default_account)
     order = await Order(trx["operations"][0][1], blockchain_instance=bitshares)
-    log.info("Order from an operation: {}".format(order))
+    log.info(f"Order from an operation: {order}")
 
 
 @pytest.mark.asyncio
@@ -104,11 +104,11 @@ async def test_filled_order(default_account, do_trade):
     a = await Account(default_account)
     history = a.history(only_ops=["fill_order"])
     trades = [entry async for entry in history]
-    assert len(trades) > 0
+    assert trades
     trade = trades[0]["op"][1]
     order = await FilledOrder(trade)
     # Test __repr__
-    log.info("Order from history: {}".format(order))
+    log.info(f"Order from history: {order}")
     # Test copy()
     await order.copy()
 

@@ -187,11 +187,11 @@ class BitSharesWebsocket(Events):
         if self.subscription_accounts and self.on_account:
             # Unfortunately, account subscriptions don't have their own
             # callback number
-            log.debug("Subscribing to accounts %s" % str(self.subscription_accounts))
+            log.debug(f"Subscribing to accounts {str(self.subscription_accounts)}")
             self.get_full_accounts(self.subscription_accounts, True)
 
         if self.subscription_markets and self.on_market:
-            log.debug("Subscribing to markets %s" % str(self.subscription_markets))
+            log.debug(f"Subscribing to markets {str(self.subscription_markets)}")
             for market in self.subscription_markets:
                 # Technially, every market could have it's own
                 # callback number
@@ -239,7 +239,7 @@ class BitSharesWebsocket(Events):
         """
         if isinstance(reply, websocket.WebSocketApp):
             reply = args[0]
-        log.debug("Received message: %s" % str(reply))
+        log.debug(f"Received message: {str(reply)}")
         data = {}
         try:
             data = json.loads(reply, strict=False)
@@ -265,22 +265,14 @@ class BitSharesWebsocket(Events):
                                 if "id" in obj:
                                     self.process_notice(obj)
                     except Exception as e:
-                        log.critical(
-                            "Error in process_notice: {}\n\n{}".format(
-                                str(e), traceback.format_exc
-                            )
-                        )
+                        log.critical(f"Error in process_notice: {str(e)}\n\n{traceback.format_exc}")
             else:
                 try:
                     callbackname = self.__events__[id]
-                    log.debug("Patching through to call %s" % callbackname)
+                    log.debug(f"Patching through to call {callbackname}")
                     [getattr(self.events, callbackname)(x) for x in data["params"][1]]
                 except Exception as e:
-                    log.critical(
-                        "Error in {}: {}\n\n{}".format(
-                            callbackname, str(e), traceback.format_exc()
-                        )
-                    )
+                    log.critical(f"Error in {callbackname}: {str(e)}\n\n{traceback.format_exc()}")
 
     def on_error(self, error, *args, **kwargs):
         """Called on websocket errors."""
@@ -288,7 +280,7 @@ class BitSharesWebsocket(Events):
 
     def on_close(self, *args, **kwargs):
         """Called when websocket connection is closed."""
-        log.debug("Closing WebSocket connection with {}".format(self.url))
+        log.debug(f"Closing WebSocket connection with {self.url}")
 
     def run_forever(self, *args, **kwargs):
         """
@@ -301,7 +293,7 @@ class BitSharesWebsocket(Events):
         while not self.run_event.is_set():
             cnt += 1
             self.url = next(self.urls)
-            log.debug("Trying to connect to node %s" % self.url)
+            log.debug(f"Trying to connect to node {self.url}")
             try:
                 # websocket.enableTrace(True)
                 self.ws = websocket.WebSocketApp(
@@ -330,7 +322,7 @@ class BitSharesWebsocket(Events):
                 return
 
             except Exception as e:
-                log.critical("{}\n\n{}".format(str(e), traceback.format_exc()))
+                log.critical(f"{str(e)}\n\n{traceback.format_exc()}")
 
     def close(self, *args, **kwargs):
         """Closes the websocket connection and waits for the ping thread to close."""

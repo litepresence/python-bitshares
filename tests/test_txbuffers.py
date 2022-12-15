@@ -64,7 +64,7 @@ class Testcases(unittest.TestCase):
                 "prefix": "TEST",
             }
         )
-        for _ in range(0, 3):
+        for _ in range(3):
             proposal1.appendOps(op)
 
         # Proposal 1
@@ -78,7 +78,7 @@ class Testcases(unittest.TestCase):
                 "prefix": "TEST",
             }
         )
-        for _ in range(0, 2):
+        for _ in range(2):
             proposal2.appendOps(op)
         tx = tx1.json()
 
@@ -89,7 +89,7 @@ class Testcases(unittest.TestCase):
         self.assertEqual(prop[0], 22)
         ps = prop[1]
         self.assertEqual(len(ps["proposed_ops"]), 3)
-        for i in range(0, 3):
+        for i in range(3):
             self.assertEqual(ps["proposed_ops"][i]["op"][0], 0)
 
         # Test proposal 2
@@ -97,5 +97,5 @@ class Testcases(unittest.TestCase):
         self.assertEqual(prop[0], 22)
         ps = prop[1]
         self.assertEqual(len(ps["proposed_ops"]), 2)
-        for i in range(0, 2):
+        for i in range(2):
             self.assertEqual(ps["proposed_ops"][i]["op"][0], 0)

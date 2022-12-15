@@ -61,7 +61,7 @@ class Memo(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             prefix = kwargs.pop("prefix", default_prefix)
             if "message" in kwargs and kwargs["message"]:
@@ -84,7 +84,7 @@ class Price(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -98,7 +98,7 @@ class PriceFeed(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -125,7 +125,7 @@ class Permission(GrapheneObject):
         else:
             prefix = kwargs.pop("prefix", default_prefix)
 
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             kwargs["key_auths"] = sorted(
                 kwargs["key_auths"],
@@ -164,7 +164,7 @@ class AccountOptions(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             # remove dublicates
             kwargs["votes"] = list(set(kwargs["votes"]))
@@ -194,7 +194,7 @@ class AssetOptions(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -253,7 +253,7 @@ class BitAssetOptions(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -284,6 +284,7 @@ class BitAssetOptions(GrapheneObject):
 
 class Worker_initializer(Static_variant):
     def __init__(self, o):
+
         class Burn_worker_initializer(GrapheneObject):
             def __init__(self, kwargs):
                 super().__init__(OrderedDict([]))
@@ -292,12 +293,14 @@ class Worker_initializer(Static_variant):
             def __init__(self, kwargs):
                 super().__init__(OrderedDict([]))
 
+
+
         class Vesting_balance_worker_initializer(GrapheneObject):
             def __init__(self, *args, **kwargs):
                 if isArgsThisClass(self, args):
                     self.data = args[0].data
                 else:
-                    if len(args) == 1 and len(kwargs) == 0:
+                    if len(args) == 1 and not kwargs:
                         kwargs = args[0]
                     super().__init__(
                         OrderedDict(
@@ -310,6 +313,7 @@ class Worker_initializer(Static_variant):
                         )
                     )
 
+
         id = o[0]
         if id == 0:
             data = Refund_worker_initializer(o[1])
@@ -318,7 +322,7 @@ class Worker_initializer(Static_variant):
         elif id == 2:
             data = Burn_worker_initializer(o[1])
         else:
-            raise ValueError("Unknown {}".format(self.__class__.name))
+            raise ValueError(f"Unknown {self.__class__.name}")
         super().__init__(data, id)
 
 
@@ -351,20 +355,20 @@ class SpecialAuthority(Static_variant):
 
 class Extension(Array):
     def __init__(self, *args, **kwargs):
-        self.json = {}
         a = []
-        for key, value in kwargs.items():
-            self.json.update({key: value})
+        self.json = dict(kwargs)
         for arg in args:
             if isinstance(arg, dict):
-                self.json.update(arg)
+                self.json |= arg
 
         for index, extension in enumerate(self.sorted_options):
             name = extension[0]
             klass = extension[1]
-            for key, value in self.json.items():
-                if key.lower() == name.lower():
-                    a.append(Static_variant(klass(value), index))
+            a.extend(
+                Static_variant(klass(value), index)
+                for key, value in self.json.items()
+                if key.lower() == name.lower()
+            )
         super().__init__(a)
 
     def __str__(self):
@@ -380,7 +384,7 @@ class AccountCreateExtensions(Extension):
 
     class Buyback_options(GrapheneObject):
         def __init__(self, *args, **kwargs):
-            kwargs.update(args[0])
+            kwargs |= args[0]
             super().__init__(
                 OrderedDict(
                     [
@@ -406,20 +410,20 @@ class AccountCreateExtensions(Extension):
 
 
 class CallOrderExtension(Extension):
-    def targetCollateralRatio(value):
-        if value:
-            return Uint16(value)
-        else:
-            return None
+    def targetCollateralRatio(self):
+        return Uint16(self) if self else None
 
     sorted_options = [("target_collateral_ratio", targetCollateralRatio)]
 
 
 class AssertPredicate(Static_variant):
     def __init__(self, o):
+
+
+
         class Account_name_eq_lit_predicate(GrapheneObject):
             def __init__(self, *args, **kwargs):
-                kwargs.update(args[0])
+                kwargs |= args[0]
                 super().__init__(
                     OrderedDict(
                         [
@@ -429,9 +433,12 @@ class AssertPredicate(Static_variant):
                     )
                 )
 
+
+
+
         class Asset_symbol_eq_lit_predicate(GrapheneObject):
             def __init__(self, *args, **kwargs):
-                kwargs.update(args[0])
+                kwargs |= args[0]
                 super().__init__(
                     OrderedDict(
                         [
@@ -441,10 +448,14 @@ class AssertPredicate(Static_variant):
                     )
                 )
 
+
+
+
         class Block_id_predicate(GrapheneObject):
             def __init__(self, *args, **kwargs):
-                kwargs.update(args[0])
+                kwargs |= args[0]
                 super().__init__(OrderedDict([("id", BlockId(kwargs["id"]))]))
+
 
         id = o[0]
         if id == 0:
@@ -454,5 +465,5 @@ class AssertPredicate(Static_variant):
         elif id == 2:
             data = Block_id_predicate(o[1])
         else:
-            raise ValueError("Unknown {}".format(self.__class__.name))
+            raise ValueError(f"Unknown {self.__class__.name}")
         super().__init__(data, id)

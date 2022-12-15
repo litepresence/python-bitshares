@@ -279,7 +279,7 @@ async def test_subscribe_to_pending_transactions(bitshares, default_account):
     await bitshares.transfer("init1", 10, "TEST", memo="xxx", account=default_account)
 
     event_correct = False
-    for _ in range(0, 6):
+    for _ in range(6):
         event = await bitshares.notifications.get()
         if event["params"][0] == 0:
             event_correct = True
@@ -292,7 +292,7 @@ async def test_subscribe_to_blocks(bitshares):
     await bitshares.cancel_subscriptions()
     await bitshares.subscribe_to_blocks()
     event_correct = False
-    for _ in range(0, 6):
+    for _ in range(6):
         event = await bitshares.notifications.get()
         if event["params"][0] == 2:
             event_correct = True
@@ -311,7 +311,7 @@ async def test_subscribe_to_accounts(bitshares, default_account):
 
     # Check event
     event_correct = False
-    for _ in range(0, 6):
+    for _ in range(6):
         event = await bitshares.notifications.get()
         if event["params"][0] == 1:
             event_correct = True
@@ -331,7 +331,7 @@ async def test_subscribe_to_market(bitshares, assets, default_account):
 
     # Check event
     event_correct = False
-    for _ in range(0, 10):
+    for _ in range(10):
         event = await bitshares.notifications.get()
         log.debug("getting event")
         if event["params"][0] == 4:
@@ -345,7 +345,7 @@ async def test_double_connect(bitshares_testnet):
     from bitshares.aio import BitShares
 
     bitshares = BitShares(
-        node="ws://127.0.0.1:{}".format(bitshares_testnet.service_port), num_retries=-1
+        node=f"ws://127.0.0.1:{bitshares_testnet.service_port}", num_retries=-1
     )
     await bitshares.connect()
     await bitshares.connect()
