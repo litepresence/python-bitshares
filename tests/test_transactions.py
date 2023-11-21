@@ -1138,17 +1138,21 @@ class Testcases(unittest.TestCase):
                 "enabled": False,
                 "auto_disable_time": 1000,
                 "acceptable_collateral":
-                [0,
+                [[
+                    "1.3.0",
                     {
-                        "asset": "1.3.0"
+                        "base": {
+                            "amount": 1, "asset_id": "1.3.2512" 
+                        },
+                        "quote": {
+                            "amount": 250000, "asset_id": "1.3.0"
+                        }
                     }
-                ],
+                ]],
                 "acceptable_borrowers":
-                [0,
-                    {
-                        "account": "1.2.1"
-                    }
-                ],
+                [[
+                    "1.2.1",1000
+                ]],
                 "extensions": [],
             }
         )
@@ -1182,17 +1186,21 @@ class Testcases(unittest.TestCase):
                 "enabled": True,
                 "auto_disable_time": False,
                 "acceptable_collateral":
-                [0,
+                [[
+                    "1.3.0",
                     {
-                        "asset": "1.3.0"
+                        "base": {
+                            "amount": 1, "asset_id": "1.3.2512" 
+                        },
+                        "quote": {
+                            "amount": 250000, "asset_id": "1.3.0"
+                        }
                     }
-                ],
+                ]],
                 "acceptable_borrowers":
-                [0,
-                    {
-                        "account": "1.2.1"
-                    }
-                ],
+                [[
+                    "1.2.1",1000
+                ]],
                 "extensions": [],
             }
         )
