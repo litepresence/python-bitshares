@@ -83,7 +83,7 @@ def getOperationName(id: str):
     if isinstance(id, str):
         # Some graphene chains (e.g. steem) do not encode the
         # operation_type as id but in its string form
-        assert id in operations.keys(), "Unknown operation {}".format(id)
+        assert id in operations.keys(), f"Unknown operation {id}"
         return id
     elif isinstance(id, int):
         return getOperationNameForId(id)
